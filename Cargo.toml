@@ -16,6 +16,7 @@ ufmt = "0.2.0"
 nb = "1.1.0"
 embedded-hal = "1.0"
 lcd-lcm1602-i2c = "0.3.0"
+dht-sensor = "0.2.1"
 
 [dependencies.arduino-hal]
 git = "https://github.com/rahix/avr-hal"

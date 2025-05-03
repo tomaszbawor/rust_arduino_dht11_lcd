@@ -2,8 +2,12 @@
 #![no_main]
 
 use arduino_hal::{clock::MHz16, Delay, I2c};
+use dht_sensor::dht11;
+use dht_sensor::DhtReading;
+use embedded_hal::delay::DelayNs;
 use lcd_lcm1602_i2c::sync_lcd::Lcd;
 use panic_halt as _;
+use ufmt::uwriteln;
 
 #[arduino_hal::entry]
 fn main() -> ! {
@@ -21,12 +25,28 @@ let mut lcd = Lcd::new(&mut i2c, &mut delay)
     .init().unwrap();         // initialize the LCD (clear it)
     //
 
-lcd.write_str("Rust Arduino    ").unwrap();
+lcd.write_str("Tomasz Bawor").unwrap();
 lcd.set_cursor(1, 0);
-lcd.write_str("This is Working").unwrap();
+lcd.write_str("Weather Station").unwrap();
 
+let mut dht_pin = pins.d4;
 
-    loop {
-        arduino_hal::delay_ms(1000);
+    let mut delayw = Delay::new();
+    let mut dht_out = dht_pin.into_opendrain_high();
+loop {
+        // Read DHT11 (temperature and humidity)
+        match dht11::Reading::read(&mut delayw, &mut dht_out) {
+            Ok(data) => {
+                lcd.clear().unwrap();
+                uwriteln!(lcd, "Temp: {}°C", data.temperature).unwrap();
+                lcd.set_cursor(0, 1).unwrap();
+                uwriteln!(lcd, "Humidity: {}%", data.relative_humidity).unwrap();
+            }
+            Err(e) => {
+                lcd.clear().unwrap();
+                lcd.write_str("DHT11 Error").unwrap();
+            }
+        }
+        
     }
 }
