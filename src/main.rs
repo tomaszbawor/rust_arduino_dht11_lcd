@@ -21,7 +21,9 @@ let mut lcd = Lcd::new(&mut i2c, &mut delay)
     .init().unwrap();         // initialize the LCD (clear it)
     //
 
-lcd.write_str("Rust Arduino").unwrap();
+lcd.write_str("Rust Arduino    ").unwrap();
+lcd.set_cursor(1, 0);
+lcd.write_str("This is Working").unwrap();
 
 
     loop {
